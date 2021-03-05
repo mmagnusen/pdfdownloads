@@ -2,7 +2,10 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const app = express();
 const serverless = require('serverless-http');
-
+var fs = require('fs');
+// var path = require('path');
+var file = fs.createReadStream('./downloads/sample.pdf');
+var stat = fs.statSync('./downloads/sample.pdf');
 
 
 // app.get('/', function (req, res) {
@@ -35,7 +38,11 @@ router.get('/', (req, res) => {
 })
 
 router.get('/download', (req, res) => {
-    res.json({ 'what': 'download' })
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=sample.pdf');
+    file.pipe(res);
+    // res.json({ 'what': 'download' })
 })
 
 app.use('/.netlify/functions/api', router);
